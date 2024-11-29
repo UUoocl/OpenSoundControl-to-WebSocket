@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
+	"id": "osc-to-obs-websocket",
+	"name": "osc-to-obs-websocket",
+	"version": "0.0.1",
+	"minAppVersion": "1.7.7",
+	"description": "A bridge between OSC apps and OBS Websocket Server.",
 	"author": "Obsidian",
 	"authorUrl": "https://obsidian.md",
 	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+	"isDesktopOnly": true
 }
