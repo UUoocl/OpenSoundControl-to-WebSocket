@@ -49,17 +49,32 @@ export class oscToObsSettingsTab extends PluginSettingTab {
              })
         });
 
+
+//		 
+//	#region OSC Device 1
+//
         new Setting(containerEl)
-        .setName("OSC Server Settings")
+        .setName("OSC Device 1 Settings")
         .setHeading()
+
+        new Setting(containerEl)
+        .setName("OSC Device Name")
+        .setDesc("Unique device name")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscName1_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscName1_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
 
         new Setting(containerEl)
         .setName("OSC IP address")
         .setDesc("Enter the IP address or 'localhost'")
         .addText((item) => {
-            item.setValue(this.plugin.settings.oscIP_Text).onChange(
+            item.setValue(this.plugin.settings.oscIP1_Text).onChange(
                 (value) => {
-                    this.plugin.settings.oscIP_Text = value;
+                    this.plugin.settings.oscIP1_Text = value;
                     this.plugin.saveSettings()
              })
         });
@@ -67,9 +82,9 @@ export class oscToObsSettingsTab extends PluginSettingTab {
         new Setting(containerEl)
         .setName("OSC Incoming Message PORT")
         .addText((item) => {
-            item.setValue(this.plugin.settings.oscInPort_Text).onChange(
+            item.setValue(this.plugin.settings.oscInPort1_Text).onChange(
                 (value) => {
-                    this.plugin.settings.oscInPort_Text = value;
+                    this.plugin.settings.oscInPort1_Text = value;
                     this.plugin.saveSettings()
              })
         });
@@ -77,13 +92,64 @@ export class oscToObsSettingsTab extends PluginSettingTab {
         new Setting(containerEl)
         .setName("OSC Out going Message PORT")
         .addText((item) => {
-            item.setValue(this.plugin.settings.oscOutPort_Text).onChange(
+            item.setValue(this.plugin.settings.oscOutPort1_Text).onChange(
                 (value) => {
-                    this.plugin.settings.oscOutPort_Text = value;
+                    this.plugin.settings.oscOutPort1_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+// #endregion
+
+//		 
+//	#region OSC Device 2
+//
+        new Setting(containerEl)
+        .setName("OSC Device 2 Settings")
+        .setHeading()
+
+        new Setting(containerEl)
+        .setName("OSC Device Name")
+        .setDesc("Unique device name")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscName2_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscName2_Text = value;
                     this.plugin.saveSettings()
              })
         });
 
+        new Setting(containerEl)
+        .setName("OSC IP address")
+        .setDesc("Enter the IP address or 'localhost'")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscIP2_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscIP2_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC Incoming Message PORT")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscInPort2_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscInPort2_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC Out going Message PORT")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscOutPort2_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscOutPort2_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+// #endregion
+    
     }
 
 }

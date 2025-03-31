@@ -8,18 +8,23 @@ interface oscToObsPluginSettings{
 	websocketIP_Text: string;
 	websocketPort_Text: string;
 	websocketPW_Text: string;
-	oscIP_Text: string;
-	oscInPort_Text: string;
-	oscOutPort_Text: string;
+	oscName1_Text: string;
+	oscIP1_Text: string;
+	oscInPort1_Text: string;
+	oscOutPort1_Text: string;
+	oscName2_Text: string;
+	oscIP2_Text: string;
+	oscInPort2_Text: string;
+	oscOutPort2_Text: string;
 }
 
 const DEFAULT_SETTINGS: Partial<oscToObsPluginSettings> = {
 	websocketIP_Text: "localhost",
 	websocketPort_Text: "4455",
 	websocketPW_Text: "password",
-	oscIP_Text: "localhost",
-	oscInPort_Text: "4466",
-	oscOutPort_Text: "4477"
+	oscIP1_Text: "localhost",
+	oscInPort1_Text: "4466",
+	oscOutPort1_Text: "4477"
 };
 
 export default class oscToObsPlugin extends Plugin {
@@ -47,29 +52,36 @@ export default class oscToObsPlugin extends Plugin {
 		
 		this.addRibbonIcon("activity","start OSC to Websocket", () => {
 			new Notice("Starting OSC Server")
-			var websocketIP = this.settings.websocketIP_Text;
-			var websocketPort = this.settings.websocketPort_Text;
-			var websocketPassword = this.settings.websocketPW_Text;
-			var oscIP = this.settings.oscIP_Text;
-			var oscInPORT = this.settings.oscInPort_Text;
-			var oscOutPORT = this.settings.oscOutPort_Text;
+			let websocketIP = this.settings.websocketIP_Text;
+			let websocketPort = this.settings.websocketPort_Text;
+			let websocketPassword = this.settings.websocketPW_Text;
+			const devices =[
+        {
+        oscName: this.settings.oscName1_Text,  
+        oscIP: this.settings.oscIP1_Text,
+        oscInPORT: this.settings.oscInPort1_Text,
+        oscOutPORT: this.settings.oscOutPort1_Text,
+      },
+      {
+        oscName: this.settings.oscName2_Text,  
+        oscIP: this.settings.oscIP2_Text,
+        oscInPORT: this.settings.oscInPort2_Text,
+        oscOutPORT: this.settings.oscOutPort2_Text,
+      }
+      ]
 
 setOSCconnection(
   websocketIP,
   websocketPort,
   websocketPassword,
-  oscIP,
-  oscInPORT,
-  oscOutPORT
+  devices
 );
 
 async function setOSCconnection(
   websocketIP,
   websocketPort,
   websocketPassword,
-  oscIP,
-  oscInPORT,
-  oscOutPORT
+  devices
 ) {
   
   /*
@@ -86,10 +98,8 @@ async function setOSCconnection(
         rpcVersion: 1,
       }
     );
-    console.log(
-      `Connected to server ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`
-    );
-	new Notice("Connected to OBS WebSocket Server")
+    console.log(`Connected to server ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`);
+	  new Notice("Connected to OBS WebSocket Server")
     //document.title = "connection set";
   } catch (error) {
 	new Notice("Failed to connect to OBS WebSocket Server")
@@ -100,22 +110,67 @@ async function setOSCconnection(
   });
   console.log(`ws://${websocketIP}:${websocketPort}`);
 
-
 /*
  *Create an OSC Server connection
  *OSC app -- to--> OBS
  */
 
-var oscServer = new Server(oscInPORT, oscIP);
+//let oscServer = new Server(oscInPORT, oscIP);
 
-oscServer.on("listening", () => {
-  console.log("OSC Server is listening.");
-});
+class OSCdevice{
+  constructor(name, oscIP, oscInPORT, oscOutPORT){
+    this.name = name;
+    this.oscIP = oscIP;
+    this.oscInPORT = oscInPORT;
+    this.oscOutPORT = oscOutPORT;
+    this.oscServer = new Server(this.oscInPORT, this.oscIP),
+    this.oscClient = new Client(this.oscIP, this.oscOutPORT),
+    
+    this.oscServer.on("listening", () => {
+      //console.log("OSC Server is listening.");
+      new Notice("OSC Server is listening.");
+    });
+ 
+    this.oscServer.on("message", (msg) => {
+      console.log(`Message: ${msg}`);
+      sendToOBS(msg, obs, "osc-message");
+    });
+  }
+}
 
-oscServer.on("message", (msg) => {
-  console.log(`Message: ${msg}`);
-  sendToOBS(msg, obs, "osc-message");
-});
+const oscDevices = {};
+
+for(let i=0; i < devices.length; i++){
+  console.log(devices[i]);
+  const deviceObject = new OSCdevice(devices[i].oscName, devices[i].oscIP, devices[i].oscInPORT, devices[i].oscOutPORT)
+  oscDevices[devices[i].oscName] = deviceObject; 
+};
+
+console.log(oscDevices);
+console.log(oscDevices.zoomOSC.oscClient);
+
+
+  // zero:{
+  //   deviceName: devices.Name1,
+  //   oscServer: new Server(devices.oscInPORT1, devices.oscIP1),
+  //   oscClient: new Client(devices.oscIP1, devices.oscOutPORT1),
+  // },
+  // one:{
+  //   oscServer: new Server(devices.oscInPORT1, devices.oscIP1),
+  //   oscClient: new Client(devices.oscIP1, devices.oscOutPORT1),
+  // }
+
+// oscDevices[`one`].oscServer.on("listening", () => {
+//   //console.log("OSC Server is listening.");
+//   new Notice("OSC Server is listening.");
+// });
+
+// oscDevices[`zero`].oscServer.on("message", (msg) => {
+//   console.log(`Message: ${msg}`);
+//   sendToOBS(msg, obs, "osc-message");
+// });
+// console.log("oscServer", oscDevices.oscServer, oscIP, oscOutPORT, oscInPORT);
+// console.log("oscClient", oscDevices.oscClient, oscIP, oscOutPORT, oscInPORT);
 
 function sendToOBS(msgParam, obsParam, eventName) {
     console.log("sending message:", JSON.stringify(msgParam));
@@ -135,9 +190,7 @@ function sendToOBS(msgParam, obsParam, eventName) {
    *Create OSC Client Out Port
    *message from OBS --to--> OSC app
    */
-   const oscClient = new Client(oscIP, oscOutPORT);
-   console.log("oscClient", oscClient, oscIP, oscOutPORT, oscInPORT);
- 
+
    obs.on("CustomEvent", function (event) {
      console.log("Message from OBS",event);
      if (event.event_name === "OSC-out") {
@@ -171,7 +224,8 @@ function sendToOBS(msgParam, obsParam, eventName) {
          console.log(message);
        }
        console.log("message to OSC device", message);
-       oscClient.send(message, (err) => {
+       console.log("OSC device", oscDevices.zoomOSC.oscClient)
+       oscDevices[`zoomOSC`].oscClient.send(message, (err) => {
          if (err) {
            console.error(new Error(err));
          }
@@ -180,7 +234,7 @@ function sendToOBS(msgParam, obsParam, eventName) {
      }
   });
  }
-			
+ 
 		})
 
 
