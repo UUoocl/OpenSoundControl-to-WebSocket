@@ -1,7 +1,7 @@
 {
-	"name": "osc-to-obs-websocket",
+	"name": "osc-to-websocket",
 	"version": "0.0.1",
-	"description": "A bridge between OSC apps and OBS Websocket Server.",
+	"description": "A bridge between OpenSoundControl(OSC) apps and Open Broadcast Studio Websocket Server.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

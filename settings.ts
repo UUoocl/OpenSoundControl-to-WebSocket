@@ -1,10 +1,10 @@
-import oscToObsPlugin from "main";
-import {App, PluginSettingTab, Setting } from "obsidian";
+import oscToWebSocketPlugin from "main";
+import {App, Notice, Platform, PluginSettingTab, Setting, normalizePath } from "obsidian";
 
-export class oscToObsSettingsTab extends PluginSettingTab {
-    plugin: oscToObsPlugin;
+export class oscToWebSocketSettingsTab extends PluginSettingTab {
+    plugin: oscToWebSocketPlugin;
 
-    constructor(app: App, plugin: oscToObsPlugin){
+    constructor(app: App, plugin: oscToWebSocketPlugin){
         super(app,plugin);
         this.plugin = plugin;
     }
@@ -13,10 +13,12 @@ export class oscToObsSettingsTab extends PluginSettingTab {
         let { containerEl } = this;
         containerEl.empty();
 
+        // #region OBS WSS Settings
+        //
         new Setting(containerEl)
-        .setName("OBS WebSocket Server Settings")
+        .setName("OBS WebSocket Server")
         .setHeading()
-        .setDesc("Copy the Websocket Server Settings from OBS")
+        //.setDesc("Websocket Server Settings from OBS")
         
         new Setting(containerEl)
         .setName("OBS WebSocket Server IP")
@@ -26,35 +28,121 @@ export class oscToObsSettingsTab extends PluginSettingTab {
                 (value) => {
                     this.plugin.settings.websocketIP_Text = value;
                     this.plugin.saveSettings()
-             })
-        });
-
+                })
+            });
+            
         new Setting(containerEl)
-        .setName("OBS WebSocket Server PORT")
+        .setName("OBS WebSocket Server Port")
         .addText((item) => {
             item.setValue(this.plugin.settings.websocketPort_Text).onChange(
                 (value) => {
                     this.plugin.settings.websocketPort_Text = value;
                     this.plugin.saveSettings()
-             })
-        });
-
+                })
+            });
+            
+            new Setting(containerEl)
+            .setName("OBS WebSocket Server Password")
+            .addText((item) => {
+                item.setValue(this.plugin.settings.websocketPW_Text).onChange(
+                    (value) => {
+                        this.plugin.settings.websocketPW_Text = value;
+                        this.plugin.saveSettings()
+                    })
+                }); 
+        // #endregion
+                    
+        ///
+        // #region OBS Launch Parameters
+        ///
+        
         new Setting(containerEl)
-        .setName("OBS WebSocket Server Password")
-        .addText((item) => {
-            item.setValue(this.plugin.settings.websocketPW_Text).onChange(
-                (value) => {
-                    this.plugin.settings.websocketPW_Text = value;
-                    this.plugin.saveSettings()
-             })
-        });
+                .setName("OBS Launch Parameters")
+                .setHeading()
+                .setDesc("Open OBS with these options.")
+                
+                if(Platform.isMacOS){
+                    new Setting(containerEl)
+                    .setName("Name")
+                    .setDesc("Enter 'OBS' or a custom name")
+                    .addText((item) => {
+                        item.setValue(this.plugin.settings.obsAppName_Text).onChange(
+                            (value) => {
+                                this.plugin.settings.obsAppName_Text = value;
+                                this.plugin.saveSettings()
+                            })
+                        });
+                    }
+                
+                if(Platform.isWin){
+                    new Setting(containerEl)
+                    .setName("Name")
+                    .setDesc("Enter 'obs64.exe' or a custom name")
+                    .addText((item) => {
+                        item.setValue(this.plugin.settings.obsAppName_Text).onChange(
+                            (value) => {
+                                this.plugin.settings.obsAppName_Text = value;
+                                this.plugin.saveSettings()
+                            })
+                        });
+        
+                    new Setting(containerEl)
+                    .setName("Path to OBS app")
+                    .addText((item) => {
+                        item.setValue(this.plugin.settings.obsAppPath_Text).onChange(
+                            (value) => {
+                                this.plugin.settings.obsAppPath_Text = value;
+                                this.plugin.saveSettings()
+                            })
+                        });
+                    }
+        
+                new Setting(containerEl)
+                .setName("Collection")
+                .addText((item) => {
+                    item.setValue(this.plugin.settings.obsCollection_Text).onChange(
+                        (value) => {
+                            this.plugin.settings.obsCollection_Text = value;
+                            this.plugin.saveSettings()
+                    })
+                });
+        
+                new Setting(containerEl)
+                .setName("OBS Browser Source Debug Port")
+                .setDesc("Enter a Port for the Remote Debugger, or leave blank to skip this option")
+                .addText((item) => {
+                    item.setValue(this.plugin.settings.obsDebugPort_Text).onChange(
+                        (value) => {
+                            this.plugin.settings.obsDebugPort_Text = value;
+                            this.plugin.saveSettings()
+                        })
+                    });
+                    
+                new Setting(containerEl)
+                .setName("Open OBS")
+                .addButton((button) => {
+                    button.setButtonText("Launch")
+                    .onClick(() => { 
+                        this.app.commands.executeCommandById('osc-to-websocket:open-obs')
+                    })
+                })
 
+                new Setting(containerEl)
+                .setName("Connect to OBS WebSocket Server")
+                .addButton((button) => {
+                    button.setButtonText("Connect")
+                    .onClick(() => {
+                        this.app.commands.executeCommandById('osc-to-websocket:connect-to-obs-websocket')
+                    })
+                })
+        // #endregion
 
-//		 
-//	#region OSC Device 1
-//
+                        
+        //		 
+        //	#region OSC Device 1
+        //
         new Setting(containerEl)
-        .setName("OSC Device 1 Settings")
+        .setName("OSC Device 1")
         .setHeading()
 
         new Setting(containerEl)
@@ -80,7 +168,7 @@ export class oscToObsSettingsTab extends PluginSettingTab {
         });
 
         new Setting(containerEl)
-        .setName("OSC Incoming Message PORT")
+        .setName("OSC Incoming Message Port")
         .addText((item) => {
             item.setValue(this.plugin.settings.oscInPort1_Text).onChange(
                 (value) => {
@@ -90,7 +178,7 @@ export class oscToObsSettingsTab extends PluginSettingTab {
         });
 
         new Setting(containerEl)
-        .setName("OSC Out going Message PORT")
+        .setName("OSC Out going Message Port")
         .addText((item) => {
             item.setValue(this.plugin.settings.oscOutPort1_Text).onChange(
                 (value) => {
@@ -98,13 +186,23 @@ export class oscToObsSettingsTab extends PluginSettingTab {
                     this.plugin.saveSettings()
              })
         });
+
+        new Setting(containerEl)
+            .setName("Start OSC 1")
+            .addButton((button) => {
+                button.setButtonText("OSC 1")
+                    .onClick(() => {
+                        this.app.commands.executeCommandById('osc-to-websocket:connect-to-osc-1')
+                    })
+            })
+
 // #endregion
 
 //		 
 //	#region OSC Device 2
 //
         new Setting(containerEl)
-        .setName("OSC Device 2 Settings")
+        .setName("OSC Device 2")
         .setHeading()
 
         new Setting(containerEl)
@@ -130,7 +228,7 @@ export class oscToObsSettingsTab extends PluginSettingTab {
         });
 
         new Setting(containerEl)
-        .setName("OSC Incoming Message PORT")
+        .setName("OSC Incoming Message Port")
         .addText((item) => {
             item.setValue(this.plugin.settings.oscInPort2_Text).onChange(
                 (value) => {
@@ -140,11 +238,71 @@ export class oscToObsSettingsTab extends PluginSettingTab {
         });
 
         new Setting(containerEl)
-        .setName("OSC Out going Message PORT")
+        .setName("OSC Out going Message Port")
         .addText((item) => {
             item.setValue(this.plugin.settings.oscOutPort2_Text).onChange(
                 (value) => {
                     this.plugin.settings.oscOutPort2_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+            .setName("Start OSC 2")
+            .addButton((button) => {
+                button.setButtonText("OSC 2")
+                    .onClick(() => {
+                        this.app.commands.executeCommandById('osc-to-websocket:connect-to-osc-2')
+                    })
+            })
+
+// #endregion
+    
+//		 
+//	#region OSC Device 3
+//
+        new Setting(containerEl)
+        .setName("OSC Device 3 Settings")
+        .setHeading()
+
+        new Setting(containerEl)
+        .setName("OSC Device Name")
+        .setDesc("Unique device name")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscName3_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscName3_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC IP address")
+        .setDesc("Enter the IP address or 'localhost'")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscIP3_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscIP3_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC Incoming Message Port")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscInPort3_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscInPort3_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC Out going Message Port")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscOutPort3_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscOutPort3_Text = value;
                     this.plugin.saveSettings()
              })
         });
