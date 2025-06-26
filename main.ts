@@ -71,32 +71,10 @@ export default class oscToWebSocketPlugin extends Plugin {
 		new Notice(this.settings.websocketIP_Text)	
 		
     let obs = this.app.plugins.plugins['osc-to-websocket'].settings.obs;
-	let oscClient1 = {}, oscClient2 = {};
+	let oscClient1 = {}, oscClient2 = {}, oscClient3 = {}, oscClient4 = {}, oscClient5 = {};
     this.app.plugins.plugins['osc-to-websocket'].settings.oscDevices = {};
 
 	obs = new OBSWebSocket();
-
-	// class OSCdevice {
-	// 			constructor(name, oscIP, oscInPORT, oscOutPORT) {
-	// 				this.name = name;
-	// 				this.oscIP = oscIP;
-	// 				this.oscInPORT = oscInPORT;
-	// 				this.oscOutPORT = oscOutPORT;
-	// 				//this.oscServer = new Server(this.oscInPORT, this.oscIP),
-	// 				//this.oscClient = new Client(this.oscIP, this.oscOutPORT),
-
-	// 				this.oscServer.on("listening", () => {
-	// 					//console.log("OSC Server is listening.");
-	// 					new Notice(`OSC Server ${this.name} is listening.`);
-	// 				});
-
-	// 				this.oscServer.on("message", (msg) => {
-	// 					console.log(`Message: ${msg}`);
-	// 					sendToOBS(msg, "osc-message");
-	// 				});
-	// 			}
-	// 		}
-
 
 	//
 	// #region Connect to OBS Websocket connection
@@ -239,19 +217,28 @@ export default class oscToWebSocketPlugin extends Plugin {
 							}
 						});
 						break;
+					case oscClient3.oscName:
+						oscClient3.oscClient.send(message, (err) => {
+							if (err) {
+								console.error(new Error(err));
+							}
+						});
+						break;
+					case oscClient4.oscName:
+						oscClient4.oscClient.send(message, (err) => {
+							if (err) {
+								console.error(new Error(err));
+							}
+						});
+						break;
+					case oscClient5.oscName:
+						oscClient5.oscClient.send(message, (err) => {
+							if (err) {
+								console.error(new Error(err));
+							}
+						});
+						break;
 				}
-			
-
-				//messageToOscClient(message)
-
-				//this.app.plugins.plugins['osc-to-websocket'].settings.oscDevices.zoomOSC.oscClient.send(message)
-				//console.log("oscclient",oscClientTemp)
-				// oscClientTemp.send(message, (err) => {
-				// 		if (err) {
-				// 			console.error(new Error(err));
-				// 		}
-				// 	});
-				//client.send(`${event.command} "${event.data}"`)
 			}
 		});		
 
@@ -309,9 +296,9 @@ export default class oscToWebSocketPlugin extends Plugin {
 	
 	// #endregion
 	
-	//
-	// #region Connect to OCS device 2 
-	//
+//
+// #region Connect to OCS device 2 
+//
 
 	this.addCommand({
 		id: 'connect-to-osc-2',
@@ -343,12 +330,121 @@ export default class oscToWebSocketPlugin extends Plugin {
 			});
 		}
 	})
-	// function messageToOscClient(message){
-	// 	console.log("messgae send function", message)
-	// 	oscClient1.send(message);
-	// }
 
-	// #endregion
+// #endregion
+
+//
+// #region Connect to OCS device 3
+//
+
+	this.addCommand({
+		id: 'connect-to-osc-3',
+		name: 'Connect to OCS device 3',
+		callback: async () => {
+			new Notice("Starting OSC Server 3");
+			let oscName = this.app.plugins.plugins['osc-to-websocket'].settings.oscName3_Text; 
+			let oscIP = this.app.plugins.plugins['osc-to-websocket'].settings.oscIP3_Text;
+			let oscInPORT = this.app.plugins.plugins['osc-to-websocket'].settings.oscInPort3_Text;
+			let oscOutPORT = this.app.plugins.plugins['osc-to-websocket'].settings.oscOutPort3_Text;
+			oscClient3.oscClient = new Client(oscIP, oscOutPORT);
+			oscClient3.oscName = oscName;
+
+			/*
+			*Create an OSC Server connection
+			*OSC app -- to--> OBS
+			*/
+			
+			const oscServer3 = new Server(oscInPORT, oscIP);
+			
+			oscServer3.on("listening", () => {
+				//console.log("OSC Server is listening.");
+				new Notice(`OSC Server ${oscName} is listening.`);
+			});
+			
+			oscServer3.on("message", (msg) => {
+				console.log(`Message 3: ${msg}`);
+				sendToOBS(msg, "osc-message");
+			});
+		}
+	})
+
+// #endregion
+
+//
+// #region Connect to OCS device 4
+//
+
+	this.addCommand({
+		id: 'connect-to-osc-4',
+		name: 'Connect to OCS device 4',
+		callback: async () => {
+			new Notice("Starting OSC Server 4");
+			let oscName = this.app.plugins.plugins['osc-to-websocket'].settings.oscName4_Text; 
+			let oscIP = this.app.plugins.plugins['osc-to-websocket'].settings.oscIP4_Text;
+			let oscInPORT = this.app.plugins.plugins['osc-to-websocket'].settings.oscInPort4_Text;
+			let oscOutPORT = this.app.plugins.plugins['osc-to-websocket'].settings.oscOutPort4_Text;
+			oscClient4.oscClient = new Client(oscIP, oscOutPORT);
+			oscClient4.oscName = oscName;
+
+			/*
+			*Create an OSC Server connection
+			*OSC app -- to--> OBS
+			*/
+			
+			const oscServer4 = new Server(oscInPORT, oscIP);
+			
+			oscServer4.on("listening", () => {
+				//console.log("OSC Server is listening.");
+				new Notice(`OSC Server ${oscName} is listening.`);
+			});
+			
+			oscServer4.on("message", (msg) => {
+				console.log(`Message 4: ${msg}`);
+				sendToOBS(msg, "osc-message");
+			});
+		}
+	})
+
+// #endregion
+
+
+//
+// #region Connect to OCS device 5
+//
+
+	this.addCommand({
+		id: 'connect-to-osc-5',
+		name: 'Connect to OCS device 5',
+		callback: async () => {
+			new Notice("Starting OSC Server 5");
+			let oscName = this.app.plugins.plugins['osc-to-websocket'].settings.oscName5_Text; 
+			let oscIP = this.app.plugins.plugins['osc-to-websocket'].settings.oscIP5_Text;
+			let oscInPORT = this.app.plugins.plugins['osc-to-websocket'].settings.oscInPort5_Text;
+			let oscOutPORT = this.app.plugins.plugins['osc-to-websocket'].settings.oscOutPort5_Text;
+			oscClient5.oscClient = new Client(oscIP, oscOutPORT);
+			oscClient5.oscName = oscName;
+
+			/*
+			*Create an OSC Server connection
+			*OSC app -- to--> OBS
+			*/
+			
+			const oscServer5 = new Server(oscInPORT, oscIP);
+			
+			oscServer5.on("listening", () => {
+				//console.log("OSC Server is listening.");
+				new Notice(`OSC Server ${oscName} is listening.`);
+			});
+			
+			oscServer5.on("message", (msg) => {
+				console.log(`Message 5: ${msg}`);
+				sendToOBS(msg, "osc-message");
+			});
+		}
+	})
+
+// #endregion
+
 
 //		
 // #region Open OBS feature

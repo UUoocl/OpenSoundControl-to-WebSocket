@@ -262,7 +262,7 @@ export class oscToWebSocketSettingsTab extends PluginSettingTab {
 //	#region OSC Device 3
 //
         new Setting(containerEl)
-        .setName("OSC Device 3 Settings")
+        .setName("OSC Device 3")
         .setHeading()
 
         new Setting(containerEl)
@@ -306,7 +306,138 @@ export class oscToWebSocketSettingsTab extends PluginSettingTab {
                     this.plugin.saveSettings()
              })
         });
+
+        new Setting(containerEl)
+            .setName("Start OSC 3")
+            .addButton((button) => {
+                button.setButtonText("OSC 3")
+                    .onClick(() => {
+                        this.app.commands.executeCommandById('osc-to-websocket:connect-to-osc-3')
+                    })
+            })
+
 // #endregion
+
+//		 
+//	#region OSC Device 4
+//
+        new Setting(containerEl)
+        .setName("OSC Device 4")
+        .setHeading()
+
+        new Setting(containerEl)
+        .setName("OSC Device Name")
+        .setDesc("Unique device name")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscName4_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscName4_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC IP address")
+        .setDesc("Enter the IP address or 'localhost'")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscIP4_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscIP4_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC Incoming Message Port")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscInPort4_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscInPort4_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC Out going Message Port")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscOutPort4_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscOutPort4_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+            .setName("Start OSC 4")
+            .addButton((button) => {
+                button.setButtonText("OSC 4")
+                    .onClick(() => {
+                        this.app.commands.executeCommandById('osc-to-websocket:connect-to-osc-4')
+                    })
+            })
+
+// #endregion
+
+//		 
+//	#region OSC Device 5
+//
+        new Setting(containerEl)
+        .setName("OSC Device 5")
+        .setHeading()
+
+        new Setting(containerEl)
+        .setName("OSC Device Name")
+        .setDesc("Unique device name")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscName5_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscName5_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC IP address")
+        .setDesc("Enter the IP address or 'localhost'")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscIP5_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscIP5_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC Incoming Message Port")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscInPort5_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscInPort5_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+        .setName("OSC Out going Message Port")
+        .addText((item) => {
+            item.setValue(this.plugin.settings.oscOutPort5_Text).onChange(
+                (value) => {
+                    this.plugin.settings.oscOutPort5_Text = value;
+                    this.plugin.saveSettings()
+             })
+        });
+
+        new Setting(containerEl)
+            .setName("Start OSC 5")
+            .addButton((button) => {
+                button.setButtonText("OSC 5")
+                    .onClick(() => {
+                        this.app.commands.executeCommandById('osc-to-websocket:connect-to-osc-5')
+                    })
+            })
+
+// #endregion
+
     
     }
 
